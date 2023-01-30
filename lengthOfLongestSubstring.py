@@ -32,7 +32,6 @@ Constraints:
 s consists of English letters, digits, symbols and spaces.
 """
 
-
 class Solution(object):
     def lengthOfLongestSubstring(self, s):
         """
