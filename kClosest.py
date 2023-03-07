@@ -34,71 +34,43 @@ Constraints:
 1 <= k <= points.length <= 104
 -104 < xi, yi < 104
 """
-class Solution(object):
-    '''
-    we use the divide and conquer method to find the kth largest number
-    meanwhile due to the partition function
-    after the kth number is found the points[0] to points[k-1] are all points are
-    all answers
-    '''
 
-    def kClosest(self, points, K):
-        """
-        :type points: List[List[int]]
-        :type K: int
-        :rtype: List[List[int]]
-        """
-        l = []
-        ans = self.findkth(points, 0, len(points) - 1, K)
-        for i in range(0, K, 1):
-            l.append([])
-            l[i].append(points[i][0])
-            l[i].append(points[i][1])
 
-        return l
+def distance(x): # calculate the distance from the origin
+    return x[0] * x[0] + x[1] * x[1]
 
-    def findkth(self, points, low, high, k):
-        pivot = self.partition(points, low, high)
-        if pivot == k - 1:
-            return points[k - 1]
-        if pivot > k - 1:
-            return self.findkth(points, low, pivot - 1, k)
-        return self.findkth(points, pivot + 1, high, k)
 
-    '''
-	the partition function is the same as the quicksort with median of three partition function
-	and return the pivot
-	'''
+def helper(nums, K): # find the K closest points
+    if len(nums) == 1:
+        return nums
+    n = len(nums) // 2
+    # divide and conquer
+    left_points = helper(nums[:n], K)
+    right_points = helper(nums[n:], K)
+    # merge
+    res = []
+    left = 0
+    right = 0
+    while K > 0 and left < len(left_points) and right < len(right_points):
+        if distance(left_points[left]) <= distance(right_points[right]):
+            res.append(left_points[left])
+            left += 1
+            K -= 1
+        else:
+            res.append(right_points[right])
+            right += 1
+            K -= 1
+    while K > 0 and left < len(left_points):
+        res.append(left_points[left])
+        left += 1
+        K -= 1
+    while K > 0 and right < len(right_points):
+        res.append(right_points[right])
+        right += 1
+        K -= 1
+    return res
 
-    def partition(self, points, low, high):
-        mid = self.mid3(points, low, high)
-        self.swap(points, low, mid)
-        key = points[low][0] * points[low][0] + points[low][1] * points[low][1]
-        while (low < high):
-            while (low < high and key <= points[high][0] * points[high][0] + points[high][1] * points[high][1]):
-                high -= 1
-            self.swap(points, low, high)
 
-            while (low < high and key >= points[low][0] * points[low][0] + points[low][1] * points[low][1]):
-                low += 1
-            self.swap(points, low, high)
-        return low
-
-    def mid3(self, nums, low, high):
-        mid = (low + high) // 2
-        l = []
-        l.append(nums[low])
-        l.append(nums[mid])
-        l.append(nums[high])
-        l.sort()
-        if l[1] == nums[low]:
-            return low
-        elif l[1] == nums[mid]:
-            return mid
-        return high
-
-    def swap(self, nums, index1, index2):
-        tmp = nums[index1]
-        nums[index1] = nums[index2]
-        nums[index2] = tmp
-        return
+class Solution:
+    def kClosest(self,points, K):
+        return helper(points, K)
