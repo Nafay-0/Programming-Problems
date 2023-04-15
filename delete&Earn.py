@@ -36,35 +36,43 @@ Constraints:
 1 <= nums[i] <= 104
 """
 class Solution(object):
-    def deleteAndEarn(self, nums):
-        """
-        :type nums: List[int]
-        :rtype: int
-        """
-        # Top down DP using memoization and recursion
-        def Max_Points(nums, i, memo):
+    def deleteAndEarn(self,nums):
+        nums.sort()  # Sort the input list
+        # Initialize dp array with -1
+        dp = [-1] * (len(nums) + 1)
+        # Top down recursive function
+        def Max_points(nums, i):
             if i >= len(nums):
                 return 0
-            if i in memo:
-                return memo[i]
-            # Skip
-            skip = Max_Points(nums, i + 1, memo)
-            # Take
-            take = nums[i][1] + Max_Points(nums, i + 2, memo)
-            memo[i] = max(skip, take)
-            return memo[i]
 
-        if not nums:
-            # case 1: empty list
-            return 0
-        if len(nums) == 1:
-            # case 2: non-empty list
-            return nums[0]
-        if len(nums) == 2:
-            # case 3: non-empty list
-            return max(nums[0], nums[1])
-        # case 4: non-empty list
-        nums = sorted([(i, nums.count(i) * i) for i in set(nums)])
-        return Max_Points(nums, 0, {})
+            if dp[i] != -1:
+                return dp[i]
+            # Initialize add and d
+            add = 0
+            d = 0
+            pos = -1
+            # Iterate through the list
+            for j in range(i, len(nums)):
+                # If the current element is equal to the next element
+                if nums[i] == nums[j]:
+                    d += 1
+                # If the current element is equal to the next element + 1
+                elif nums[i] + 1 == nums[j]:
+                    pos = j
+                else:
+                    break
+            # Add the current element to the add variable
+            add += (d * nums[i])
+            # If the position is not -1
+            if pos != -1:
+                # Set the dp array to the maximum of the recursive call of the current element + 1 and the recursive call of the position + 1
+                dp[i] = max(Max_points(nums, pos + 1) + add, Max_points(nums, i + 1))
+            else:
+                # Set the dp array to the recursive call of the current element + 1
+                dp[i] = max(Max_points(nums, i + d) + add, Max_points(nums, i + d))
+                # Return the dp array
+            return dp[i]
+
+        return Max_points(nums, 0)
 
 
