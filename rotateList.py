@@ -1,5 +1,5 @@
 """
-61. Rotate List
+ 
 Medium
 8K
 1.4K
